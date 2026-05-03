@@ -8,9 +8,10 @@ datasource db {
 }
 
 model Team {
-  id      Int      @id @default(autoincrement())
-  name    String   @unique
-  players Player[]
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  captainPhone String
+  players      Player[]
 }
 
 model Player {
