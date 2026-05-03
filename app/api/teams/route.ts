@@ -2,69 +2,80 @@ import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  const teams = await prisma.team.findMany({
-    include: {
-      players: true,
-    },
-  });
+  try {
+    const teams = await prisma.team.findMany({
+      include: {
+        players: true,
+      },
+    });
 
-  return NextResponse.json(teams);
+    return NextResponse.json(teams);
+  } catch (error) {
+    console.error("GET /api/teams error:", error);
+
+    return NextResponse.json(
+      { error: "Erreur serveur API teams" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
 
-  if (!body.name || !body.captainPhone) {
-    return NextResponse.json(
-      { error: "Le nom de l'équipe et le numéro du chef sont obligatoires." },
-      { status: 400 }
-    );
-  }
+    if (!body.name || !body.captainPhone) {
+      return NextResponse.json(
+        { error: "Le nom de l'équipe et le numéro du chef sont obligatoires." },
+        { status: 400 }
+      );
+    }
 
-  if (body.players.length < 11) {
-    return NextResponse.json(
-      { error: "Il faut au minimum 11 joueurs." },
-      { status: 400 }
-    );
-  }
+    if (body.players.length < 11) {
+      return NextResponse.json(
+        { error: "Il faut au minimum 11 joueurs." },
+        { status: 400 }
+      );
+    }
 
-  if (body.players.length > 15) {
-    return NextResponse.json(
-      { error: "Il faut maximum 15 joueurs." },
-      { status: 400 }
-    );
-  }
-
-  const existingTeam = await prisma.team.findUnique({
-    where: {
-      name: body.name,
-    },
-  });
-
-  if (existingTeam) {
-    return NextResponse.json(
-      {
-        error: "Cette équipe est déjà composée.",
-        captainPhone: existingTeam.captainPhone,
+    const existingTeam = await prisma.team.findUnique({
+      where: {
+        name: body.name,
       },
-      { status: 409 }
+    });
+
+    if (existingTeam) {
+      return NextResponse.json(
+        {
+          error: "Cette équipe est déjà composée.",
+          captainPhone: existingTeam.captainPhone,
+        },
+        { status: 409 }
+      );
+    }
+
+    const team = await prisma.team.create({
+      data: {
+        name: body.name,
+        captainPhone: body.captainPhone,
+        players: {
+          create: body.players,
+        },
+      },
+      include: {
+        players: true,
+      },
+    });
+
+    return NextResponse.json(team);
+  } catch (error) {
+    console.error("POST /api/teams error:", error);
+
+    return NextResponse.json(
+      { error: "Erreur serveur lors de la création." },
+      { status: 500 }
     );
   }
-
-  const team = await prisma.team.create({
-    data: {
-      name: body.name,
-      captainPhone: body.captainPhone,
-      players: {
-        create: body.players,
-      },
-    },
-    include: {
-      players: true,
-    },
-  });
-
-  return NextResponse.json(team);
 }
 
 export async function DELETE(req: Request) {
