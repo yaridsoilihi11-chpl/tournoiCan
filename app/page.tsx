@@ -14,7 +14,14 @@ export default function Home() {
   async function loadTeams() {
     const res = await fetch("/api/teams");
     const data = await res.json();
-    setTeams(data);
+
+    if (Array.isArray(data)) {
+      setTeams(data);
+    } else {
+      console.error("Erreur API teams:", data);
+      setTeams([]);
+      setMessage(data.error || "Erreur lors du chargement des équipes.");
+    }
   }
 
   useEffect(() => {
@@ -249,7 +256,7 @@ export default function Home() {
 
               <div className="border-t border-white/10 pt-4">
                 <p className="text-sm text-zinc-300 mb-2">
-                  Zone admin — seul le créateur peut supprimer une équipe.
+                  Zone admin — seul l'administrateur peut supprimer une équipe.
                 </p>
 
                 <div className="flex flex-wrap gap-3">
