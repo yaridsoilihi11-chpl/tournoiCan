@@ -159,7 +159,7 @@ export default function Home() {
                 <input
                   type="number"
                   min="14"
-                  max="15"
+                  max="65"
                   className="rounded-lg px-4 py-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40"
                   placeholder="Âge"
                   value={p.age}
