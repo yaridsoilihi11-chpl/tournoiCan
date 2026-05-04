@@ -15,10 +15,12 @@ export default function Home() {
     const res = await fetch("/api/teams");
     const data = await res.json();
 
+    console.log("teams API:", data);
+
     if (Array.isArray(data)) {
       setTeams(data);
+      setMessage("");
     } else {
-      console.error("Erreur API teams:", data);
       setTeams([]);
       setMessage(data.error || "Erreur lors du chargement des équipes.");
     }
@@ -46,6 +48,8 @@ export default function Home() {
   }
 
   function updatePlayer(i: number, field: string, value: string) {
+    if (field === "name" && /[0-9]/.test(value)) return;
+
     const copy = [...players];
     copy[i] = { ...copy[i], [field]: value };
     setPlayers(copy);
@@ -153,6 +157,9 @@ export default function Home() {
                 />
 
                 <input
+                  type="number"
+                  min="14"
+                  max="15"
                   className="rounded-lg px-4 py-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40"
                   placeholder="Âge"
                   value={p.age}
