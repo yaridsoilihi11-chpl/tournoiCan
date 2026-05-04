@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
 export async function GET() {
   try {
     const teams = await prisma.team.findMany({
@@ -107,6 +109,36 @@ export async function POST(req: Request) {
         error: "Erreur serveur lors de la création.",
         details: String(error),
       },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const body = await req.json();
+
+    if (!ADMIN_PASSWORD || body.password !== ADMIN_PASSWORD) {
+      return NextResponse.json(
+        { error: "Mot de passe incorrect." },
+        { status: 403 }
+      );
+    }
+
+    await prisma.player.deleteMany({
+      where: { teamId: Number(body.id) },
+    });
+
+    await prisma.team.delete({
+      where: { id: Number(body.id) },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("DELETE /api/teams error:", error);
+
+    return NextResponse.json(
+      { error: "Erreur lors de la suppression." },
       { status: 500 }
     );
   }
