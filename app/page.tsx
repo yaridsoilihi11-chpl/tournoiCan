@@ -115,7 +115,7 @@ export default function Home() {
     >
       <div className="min-h-screen bg-black/50 backdrop-blur-sm text-white p-8">
         <section className="max-w-5xl mx-auto">
-          <h1 className="text-5xl font-black text-yellow-400 mb-2">
+          <h1 className="text-5xl font-black text-yellow-400 mb-2 drop-shadow-[0_0_20px_rgba(250,204,21,0.6)]">
             Tournoi CAN ⚽
           </h1>
 
@@ -130,14 +130,14 @@ export default function Home() {
             <h2 className="text-2xl font-bold mb-4">Créer une équipe</h2>
 
             <input
-              className="w-full rounded-lg px-4 py-3 mb-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40"
+              className="w-full rounded-lg px-4 py-3 mb-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40 focus:scale-[1.01] transition duration-200"
               placeholder="Nom de l'équipe"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
 
             <input
-              className="w-full rounded-lg px-4 py-3 mb-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40"
+              className="w-full rounded-lg px-4 py-3 mb-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40 focus:scale-[1.01] transition duration-200"
               placeholder="Numéro du chef d'équipe"
               value={captainPhone}
               onChange={(e) => setCaptainPhone(e.target.value)}
@@ -150,20 +150,22 @@ export default function Home() {
             {players.map((p, i) => (
               <div key={i} className="grid grid-cols-3 gap-3 mb-3">
                 <input
-                  className="rounded-lg px-4 py-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40"
+                  className="rounded-lg px-4 py-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40 focus:scale-[1.01] transition duration-200"
                   placeholder="Nom du joueur"
                   value={p.name}
                   onChange={(e) => updatePlayer(i, "name", e.target.value)}
+                  required
                 />
 
                 <input
                   type="number"
                   min="14"
                   max="65"
-                  className="rounded-lg px-4 py-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40"
+                  className="rounded-lg px-4 py-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40 focus:scale-[1.01] transition duration-200"
                   placeholder="Âge"
                   value={p.age}
                   onChange={(e) => updatePlayer(i, "age", e.target.value)}
+                  required
                 />
 
                 <button
@@ -197,7 +199,7 @@ export default function Home() {
 
               <button
                 type="submit"
-                className="bg-yellow-400 text-black font-bold px-5 py-3 rounded-lg cursor-pointer hover:bg-yellow-300 transition duration-200"
+                className="bg-yellow-400 text-black font-bold px-5 py-3 rounded-lg cursor-pointer hover:bg-yellow-300 hover:scale-105 active:scale-95 transition duration-200 shadow-lg hover:shadow-yellow-400/40"
               >
                 Créer équipe
               </button>
@@ -218,7 +220,7 @@ export default function Home() {
                 key={t.id}
                 type="button"
                 onClick={() => setSelectedTeam(t)}
-                className="text-left bg-white/10 border border-white/10 rounded-xl p-4 cursor-pointer hover:border-yellow-400/60 hover:bg-white/15 transition duration-200"
+                className="text-left bg-white/10 border border-white/10 rounded-xl p-4 cursor-pointer hover:border-yellow-400/80 hover:bg-white/20 hover:scale-[1.02] active:scale-[0.98] transition duration-200 shadow-lg hover:shadow-yellow-500/20"
               >
                 <strong className="text-yellow-400 text-xl">{t.name}</strong>
                 <p className="text-zinc-300">{t.players.length} joueur(s)</p>
@@ -230,7 +232,7 @@ export default function Home() {
           </div>
 
           {selectedTeam && (
-            <div className="bg-black/50 border border-yellow-500/30 rounded-2xl p-6">
+            <div className="bg-black/50 border border-yellow-500/30 rounded-2xl p-6 animate-fadeIn">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold text-yellow-400">
                   {selectedTeam.name}
