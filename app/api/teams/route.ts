@@ -1,6 +1,24 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
+const countries = [
+  "Maroc",
+  "Algérie",
+  "Tunisie",
+  "Sénégal",
+  "Côte d’Ivoire",
+  "Antilles",
+  "Cameroun",
+  "Nigeria",
+  "Mali",
+  "Congo Brazzaville",
+  "RD Congo",
+  "Guinée",
+  "Reste du monde",
+  "Reste du monde",
+  "France"
+];
+
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 export async function GET() {
@@ -31,6 +49,13 @@ export async function POST(req: Request) {
     if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(body.name)) {
       return NextResponse.json(
         { error: "Le nom de l'équipe ne doit contenir que des lettres." },
+        { status: 400 }
+      );
+    }
+
+    if (!countries.includes(body.name)) {
+      return NextResponse.json(
+        { error: "Pays invalide." },
         { status: 400 }
       );
     }

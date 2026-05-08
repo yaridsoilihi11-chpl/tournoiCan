@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -88,25 +89,43 @@ export default function Home() {
   }
 
   async function deleteTeam(id: number) {
-  const res = await fetch("/api/teams", {
-    method: "DELETE",
-    body: JSON.stringify({
-      id,
-      password: adminPassword,
-    }),
-  });
+    const res = await fetch("/api/teams", {
+      method: "DELETE",
+      body: JSON.stringify({
+        id,
+        password: adminPassword,
+      }),
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) {
-    alert(data.error);
-    return;
+    if (!res.ok) {
+      alert(data.error);
+      return;
+    }
+
+    setSelectedTeam(null);
+    setAdminPassword("");
+    loadTeams();
   }
 
-  setSelectedTeam(null);
-  setAdminPassword("");
-  loadTeams();
-}
+  const countries = [
+    "Maroc",
+    "Algérie",
+    "Tunisie",
+    "Sénégal",
+    "Côte d’Ivoire",
+    "Antilles",
+    "Cameroun",
+    "Nigeria",
+    "Mali",
+    "Congo Brazzaville",
+    "RD Congo",
+    "Guinée",
+    "Reste du monde",
+    "Reste du monde",
+    "France",
+  ];
 
   return (
     <main
@@ -129,12 +148,37 @@ export default function Home() {
           >
             <h2 className="text-2xl font-bold mb-4">Créer une équipe</h2>
 
-            <input
-              className="w-full rounded-lg px-4 py-3 mb-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40 focus:scale-[1.01] transition duration-200"
-              placeholder="Nom de l'équipe"
+            <select
               value={name}
               onChange={(e) => setName(e.target.value)}
-            />
+              className="w-full rounded-lg px-4 py-3 mb-3 bg-black/40 border border-yellow-400/40 text-white focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40"
+            >
+              <option value="">Sélectionner un pays</option>
+
+              {countries.map((country, index) => {
+                const countryValue =
+                  country === "Reste du monde"
+                    ? `Reste du monde ${index}`
+                    : country;
+
+                const alreadyTaken = teams.some(
+                  (t) =>
+                    t.name.toLowerCase() ===
+                    countryValue.toLowerCase()
+                );
+
+                return (
+                  <option
+                    key={`${country}-${index}`}
+                    value={countryValue}
+                    disabled={alreadyTaken}
+                  >
+                    {country}
+                    {alreadyTaken ? " (déjà pris)" : ""}
+                  </option>
+                );
+              })}
+            </select>
 
             <input
               className="w-full rounded-lg px-4 py-3 mb-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40 focus:scale-[1.01] transition duration-200"
@@ -159,7 +203,7 @@ export default function Home() {
 
                 <input
                   type="number"
-                  min="14"
+                  min="15"
                   max="65"
                   className="rounded-lg px-4 py-3 bg-black/40 border border-yellow-400/40 text-white placeholder:text-zinc-300 focus:border-yellow-300 focus:ring-2 focus:ring-yellow-400/40 focus:scale-[1.01] transition duration-200"
                   placeholder="Âge"
@@ -231,64 +275,76 @@ export default function Home() {
             ))}
           </div>
 
-          {selectedTeam && (
-            <div className="bg-black/50 border border-yellow-500/30 rounded-2xl p-6 animate-fadeIn">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-yellow-400">
-                  {selectedTeam.name}
-                </h2>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedTeam(null)}
-                  className="bg-white/10 border border-white/20 px-4 py-2 rounded-lg cursor-pointer hover:bg-white/20 transition duration-200"
-                >
-                  Fermer
-                </button>
-              </div>
-
-              <p className="text-zinc-300 mb-4">
-                Chef d'équipe : {selectedTeam.captainPhone}
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                {selectedTeam.players.map((player: any) => (
-                  <div
-                    key={player.id}
-                    className="bg-white/10 border border-white/10 rounded-lg p-3"
-                  >
-                    <p className="font-bold">{player.name}</p>
-                    <p className="text-zinc-300">{player.age} ans</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border-t border-white/10 pt-4">
-                <p className="text-sm text-zinc-300 mb-2">
-                  Zone admin — seul l'administrateur peut supprimer une équipe.
-                </p>
-
-                <div className="flex flex-wrap gap-3">
-                  <input
-                    type="password"
-                    placeholder="Mot de passe admin"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    className="bg-black/40 border border-red-500/40 px-4 py-2 rounded-lg text-white placeholder:text-zinc-300 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
-                  />
+          <AnimatePresence>
+            {selectedTeam && (
+              <motion.div
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                transition={{ duration: 0.25 }}
+                className="bg-black/60 border border-yellow-500/30 rounded-2xl p-6 backdrop-blur-md shadow-2xl"
+              >
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-3xl font-black text-yellow-400">
+                    {selectedTeam.name}
+                  </h2>
 
                   <button
                     type="button"
-                    onClick={() => deleteTeam(selectedTeam.id)}
-                    className="bg-red-600 px-4 py-2 rounded-lg cursor-pointer hover:bg-red-500 transition duration-200"
+                    onClick={() => setSelectedTeam(null)}
+                    className="bg-red-500/20 border border-red-500/40 px-4 py-2 rounded-lg hover:bg-red-500/30 transition duration-200"
                   >
-                    Supprimer l'équipe
+                    Fermer la liste
                   </button>
                 </div>
-              </div>
-            </div>
-          )}
-        </section>
+
+                <p className="text-zinc-300 mb-5">
+                  Chef d'équipe :{" "}
+                  <span className="text-yellow-300 font-bold">
+                    {selectedTeam.captainPhone}
+                  </span>
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                  {selectedTeam.players.map((player: any) => (
+                    <motion.div
+                      key={player.id}
+                      whileHover={{ scale: 1.02 }}
+                      className="bg-white/10 border border-white/10 rounded-xl p-4 hover:border-yellow-400/40 transition duration-200"
+                    >
+                      <p className="font-bold text-lg">{player.name}</p>
+                      <p className="text-zinc-300">{player.age} ans</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="border-t border-white/10 pt-4">
+                  <p className="text-sm text-zinc-300 mb-2">
+                    Zone admin — seul l'administrateur peut supprimer une équipe.
+                  </p>
+
+                  <div className="flex flex-wrap gap-3">
+                    <input
+                      type="password"
+                      placeholder="Mot de passe admin"
+                      value={adminPassword}
+                      onChange={(e) => setAdminPassword(e.target.value)}
+                      className="bg-black/40 border border-red-500/40 px-4 py-2 rounded-lg text-white placeholder:text-zinc-300 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => deleteTeam(selectedTeam.id)}
+                      className="bg-red-600 px-4 py-2 rounded-lg cursor-pointer hover:bg-red-500 transition duration-200"
+                    >
+                      Supprimer l'équipe
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
         <div className="bg-red-500/20 border border-red-500 rounded-xl p-4 mb-8 text-center">
           <p className="text-red-400 font-bold text-lg">
             Problème lors de l'inscription ?
@@ -305,6 +361,7 @@ export default function Home() {
             07 49 07 13 93
           </a>
         </div>
+       </section>
       </div>
     </main>
   );
